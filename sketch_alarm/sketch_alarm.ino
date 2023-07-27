@@ -134,6 +134,11 @@ void setup() {
     ca.index.col = 9;
     ca.index.spaces = 1;
 
+    //temp
+    ca.index.val = 1;
+    ca.hour.val = 17;
+    ca.mins.val = 17;
+
 }
 
 
@@ -143,8 +148,16 @@ void loop() {
     print_time();
 
     check_buttons();
-
-    if (check_time()) Flag_play_alarm = true;
+    
+    // ca.index.val != 0 bc alarm must be enabled
+    if (check_time() && ca.index.val != 0) {
+        switch (ca.index.val) {
+            case 1:
+                Flag_play_alarm = true;
+            case 2:
+                if (ct.doW.val != 5 && ct.doW.val != 6) Flag_play_alarm = true;
+        }
+    }
 
     if (Flag_play_alarm && !Flag_set_time) play_alarm();
 
@@ -241,11 +254,11 @@ byte check_buttons() {
     // buttons with values:
     // noPin   mainPin plusPin minsPin
     // 0       1       2       3
-    delay(500);
+    if (!Flag_play_alarm) delay(500);
 
     if (digitalRead(mainPin) == LOW){
+        if (!Flag_set_time && !Flag_play_alarm) Flag_set_time = true;
         if (Flag_play_alarm) Flag_play_alarm = false;
-        if (!Flag_set_time) Flag_set_time = true;
         Serial.println("ButtonMain");
         return 1;
     }
@@ -292,6 +305,7 @@ void play_alarm() {
             // return if mainButton was pressed and Flag changes
             if (!Flag_play_alarm) {
                 Serial.println("Alarm cancelled!");
+                delay(500);
                 return;
             }
             
@@ -327,6 +341,9 @@ void set_time() {
     edit_elem(&ct.doW);
     edit_elem(&ct.hour);
     edit_elem(&ct.mins);
+    edit_elem(&ca.index);
+    edit_elem(&ca.hour);
+    edit_elem(&ca.mins);
 
     Flag_set_time = false;
     
@@ -359,8 +376,8 @@ void edit_elem(struct time_element* te) {
                 
                 case 0: break;
                 case 1: go_on_to_next = true; break;
-                case 2: Serial.println("+10"); time_setup((te->val) + 10, te->id); break;
-                case 3: Serial.println("-10"); time_setup((te->val) - 10, te->id); break; 
+                case 2: Serial.println("+10"); te->val = te->val + 10; time_setup(te); break;
+                case 3: Serial.println("-10"); te->val = te->val - 10; time_setup(te); break; 
             }
             
         }
@@ -387,8 +404,8 @@ void edit_elem(struct time_element* te) {
 
             case 0: break;
             case 1: go_on_to_next = true; break;
-            case 2: Serial.println("+1"); time_setup((te->val) + 1, te->id); break;
-            case 3: Serial.println("-1"); time_setup((te->val) - 1, te->id); break; 
+            case 2: Serial.println("+1"); te->val = te->val + 1; time_setup(te); break;
+            case 3: Serial.println("-1"); te->val = te->val - 1; time_setup(te); break; 
         }
     } 
 
@@ -400,7 +417,9 @@ void edit_elem(struct time_element* te) {
 }
 
 
-void time_setup(byte new_time, byte id){
+void time_setup(struct time_element* te){
+    byte new_time = te->val;
+    byte id = te->id;
     switch (id) {
         case 0: myRTC.setDate(new_time); break;
         case 1: myRTC.setMonth(new_time); break;
@@ -408,5 +427,8 @@ void time_setup(byte new_time, byte id){
         case 3: myRTC.setDoW(new_time); break;
         case 4: myRTC.setHour(new_time); break;
         case 5: myRTC.setMinute(new_time); break;
+        case 7: break;
+        case 8: break;
+        case 9: break;
     }
 }
