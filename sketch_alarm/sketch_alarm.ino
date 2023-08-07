@@ -366,14 +366,20 @@ byte check_time() {
     byte mins_diff = 0;
         
 
-    if (hour_diff < 0 || hour_diff > 2) return 0;  
-
-    else if (hour_diff == 0) {
+    if (hour_diff < 0 ) 
+    {
+        return 0;
+    }
+    else if (hour_diff > 1)
+    {
+        return 0;  
+    }
+    else if (hour_diff == 0) 
+    {
         
         mins_diff = ca.mins.val - ct.mins.val;
 
     }
-
     else if (hour_diff == 1) {
         
         mins_diff = (60 - ct.mins.val) + ca.mins.val;
