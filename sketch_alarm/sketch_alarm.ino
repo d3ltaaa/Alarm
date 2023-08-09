@@ -66,7 +66,7 @@ struct s_alarm ca;
 // Pins
 const byte LED_PIN = 6;
 const byte MAIN_PIN = 18; 
-const byte PIEZO_PIN = 7;
+const byte PIEZO_PIN = 16;
 const byte PLUS_PIN = 9;
 const byte MINS_PIN = 10;
 const int rs = 12, en = 11, d4 = 2, d5 = 3, d6 = 4, d7 = 5;
