@@ -411,34 +411,42 @@ void play_alarm() {
     Serial.println("Alarm!");
 
     while (Flag_play_alarm) {
-        
+
         // go through each note
-        for (int thisNote = 0; thisNote < 8; thisNote++) {
-            
+        for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
+
             // check if mainButton is pressed
             check_buttons();
-            
+
             // return if mainButton was pressed and Flag changes
             if (!Flag_play_alarm) {
                 Serial.println("Alarm cancelled!");
                 delay(500);
                 return;
             }
-            
-            // calculate note duration
-            int noteDuration = 1000 / noteDurations[thisNote];
 
-            // play tone
-            tone(PIEZO_PIN, melody[thisNote], noteDuration);
-            
-            // play pause
-            int pause_between_notes = noteDuration * 1.30;
 
-            delay(pause_between_notes);
+            // calculates the duration of each note
+            divider = melody[thisNote + 1];
+            if (divider > 0) {
+                // regular note, just proceed
+                noteDuration = (wholenote) / divider;
+            } else if (divider < 0) {
+                // dotted notes are represented with negative durations!!
+                noteDuration = (wholenote) / abs(divider);
+                noteDuration *= 1.5; // increases the duration in half for dotted notes
+            }
 
-            // stop play
+            // we only play the note for 90% of the duration, leaving 10% as a pause
+            tone(PIEZO_PIN, melody[thisNote], noteDuration*0.9);
+
+            // Wait for the specief duration before playing the next note.
+            delay(noteDuration);
+
+            // stop the waveform generation before the next note.
             noTone(PIEZO_PIN);
-            
+
+
             // update time and display it
             update_time();
             print_time();
