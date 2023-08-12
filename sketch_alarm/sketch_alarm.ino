@@ -168,9 +168,9 @@ void setup() {
     ca.index.max_num = 2;
 
     //temp
-    ca.index.val = 1;
-    ca.hour.val = 6;
-    ca.mins.val = 0;
+    ca.index.val = 2;
+    ca.hour.val = 5;
+    ca.mins.val = 30;
 
 }
 
@@ -188,17 +188,37 @@ void loop() {
     Serial.println(time_check);
 
     // ca.index.val != 0 bc alarm must be enabled
-    if (time_check == 1 && ca.index.val != 0) {
-        switch (ca.index.val) {
-            case 1:
-                Flag_play_alarm = true;
-            case 2:
-                if (ct.doW.val != 5 && ct.doW.val != 6) Flag_play_alarm = true;
-        }
-    }
-    else if (time_check != 1) leds(time_check);
+    // if (time_check == 1 && ca.index.val != 0) {
+    //     switch (ca.index.val) {
+    //         case 1:
+    //             Flag_play_alarm = true;
+    //         case 2:
+    //             if (ct.doW.val != 5 && ct.doW.val != 6) Flag_play_alarm = true;
+    //     }
+    // }
+    // else if (time_check != 1) leds(time_check);
 
-    if (Flag_play_alarm && !Flag_set_time) play_alarm();
+    switch (ca.index.val) {
+
+        case 1:
+            if (time_check == 1)
+            {
+                Flag_play_alarm = true;
+            }
+            else if (time_check != 1)
+            {
+                leds(time_check);
+            }
+
+        case 2:
+            if (time_check == 1 && ct.doW.val != 5 && ct.doW.val != 6) Flag_play_alarm = true;
+            if (time_check == 1 && Flag_play_alarm && !Flag_set_time) play_alarm();
+            if (time_check != 1 && ct.doW.val != 5 && ct.doW.val != 6) 
+            {
+                leds(time_check);
+            }
+
+    }
 
     if (Flag_set_time && !Flag_play_alarm) set_time();
     
